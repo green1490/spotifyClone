@@ -5,6 +5,9 @@ services:
     image: postgres
     restart: always
     environment:
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=${PASSWORD}
     volumes:
       - ./SQL:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
