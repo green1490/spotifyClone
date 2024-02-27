@@ -5,7 +5,7 @@ CREATE TABLE genre (
 
 CREATE TABLE users (
 	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	"name" varchar NOT NULL,
+	"name" varchar NOT NULL UNIQUE,
 	"password" varchar NOT NULL
 );
 
