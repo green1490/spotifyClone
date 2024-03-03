@@ -1,6 +1,8 @@
 using DB;
 using Routes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => 
+    {
+        options.ExpireTimeSpan = TimeSpan.FromDays(3);
+    });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("user_function", policy => 
+        policy.RequireRole("user"));
+
 builder.Services.AddSwaggerGen(
     c =>
     {
