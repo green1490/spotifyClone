@@ -1,11 +1,11 @@
 namespace Routes;
 
-using System.Security.Claims;
 using DB;
+using Model;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Model;
 
 public static class User
 {
@@ -30,8 +30,16 @@ public static class User
             ctx.SignOutAsync();
         });
 
-        app.MapGet("/login",(HttpContext ctx) =>
-        {
+        app.MapGet("/login",async (HttpContext ctx, DataContext db, string name, string password) =>
+        {   
+            try
+            {
+                var result = await db.Users.Where(field => field.Name == name && field.Password == password).FirstAsync();
+            }
+            catch
+            {
+                return "Unseccessful login!";
+            }
 
             List<Claim> claims =
             [
@@ -41,16 +49,19 @@ public static class User
             ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             ClaimsPrincipal claimsPrincipal = new(claimsIdentity);
 
-            ctx.SignInAsync(
+            await ctx.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 claimsPrincipal
             );
             return "Successful login!";
         });
 
-        app.MapGet("/auth-test",() =>
+        app.MapPut("/password", async (Users user, DataContext db) => 
         {
-            return "Ok";
-        }).RequireAuthorization("user_function");
+            var result = await db.Users.Where(field => field.Name == user.Name).FirstAsync();
+            result.Password = user.Password;
+            await db.SaveChangesAsync();
+            return "Changed Password!";
+        });
     }
 }
