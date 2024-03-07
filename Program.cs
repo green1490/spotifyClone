@@ -32,6 +32,11 @@ builder.Services.AddDbContext<DataContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DataBase"));
 });
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "XSRF-TOKEN";
+    options.SuppressXFrameOptionsHeader = false;
+});
 
 var app = builder.Build();
 
@@ -43,11 +48,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
+app.UseAntiforgery();
 
-User.Map(app);
+var handler = new Routes.RouteHandler(app);
+var singleton = RouteSingleton.GetInstance();
 
+handler
+    .Add(singleton.user)
+    .Add(singleton.song);
+
+handler.Map();
 app.Run();

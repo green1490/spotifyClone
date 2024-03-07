@@ -2,14 +2,16 @@ namespace Routes;
 
 using DB;
 using Model;
+using RouteInterface;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Antiforgery;
 
-public static class User
+public class User:IRoute
 {
-    public static void Map(WebApplication app)
+    public void Map(WebApplication app)
     {
         app.MapPost("/registration", async (Users user, DataContext db) =>
         {
@@ -62,6 +64,12 @@ public static class User
             result.Password = user.Password;
             await db.SaveChangesAsync();
             return "Changed Password!";
+        }).RequireAuthorization("user_function");
+
+        app.MapGet("/AF-token",(HttpContext context,IAntiforgery antiforgery) =>
+        {
+            var tokenSet = antiforgery.GetAndStoreTokens(context);
+            context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!);;
         });
     }
 }
