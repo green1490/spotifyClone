@@ -17,8 +17,8 @@ public class Song
     [Column("artist")]
     public string Artist {get;set;} = string.Empty;
 
-    [Column("song_path")]
-    public string SongPath {get;set;} = string.Empty;
+    [Column("song_data")]
+    public byte[] SongData {get;set;} = [];
 
     [Column("user_id")]
     [ForeignKey("users")]

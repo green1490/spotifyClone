@@ -13,7 +13,7 @@ CREATE TABLE song (
 	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	"name" varchar NOT NULL,
 	"artist" varchar NOT NULL,
-	"song_path" varchar NOT NULL,
+	"song_data" bytea NOT NULL,
 	"user_id" int references users(id)
 );
 

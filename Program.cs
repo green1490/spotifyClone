@@ -1,7 +1,6 @@
 using DB;
 using Routes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,10 +31,11 @@ builder.Services.AddDbContext<DataContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DataBase"));
 });
 
-builder.Services.AddAntiforgery(options =>
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
 {
-    options.HeaderName = "XSRF-TOKEN";
-    options.SuppressXFrameOptionsHeader = false;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.IsEssential = true;
 });
 
 var app = builder.Build();
@@ -49,8 +49,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseSession();
 app.MapControllers();
-app.UseAntiforgery();
 
 var handler = new Routes.RouteHandler(app);
 var singleton = RouteSingleton.GetInstance();

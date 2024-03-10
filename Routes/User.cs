@@ -7,7 +7,6 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Antiforgery;
 
 public class User:IRoute
 {
@@ -30,6 +29,7 @@ public class User:IRoute
         app.MapGet("/logout", (HttpContext ctx) => 
         {
             ctx.SignOutAsync();
+            ctx.Session.Clear();
         });
 
         app.MapGet("/login",async (HttpContext ctx, DataContext db, string name, string password) =>
@@ -37,6 +37,7 @@ public class User:IRoute
             try
             {
                 var result = await db.Users.Where(field => field.Name == name && field.Password == password).FirstAsync();
+                ctx.Session.SetString("userID",result.Id.ToString());
             }
             catch
             {
@@ -55,6 +56,7 @@ public class User:IRoute
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 claimsPrincipal
             );
+
             return "Successful login!";
         });
 
@@ -65,11 +67,5 @@ public class User:IRoute
             await db.SaveChangesAsync();
             return "Changed Password!";
         }).RequireAuthorization("user_function");
-
-        app.MapGet("/AF-token",(HttpContext context,IAntiforgery antiforgery) =>
-        {
-            var tokenSet = antiforgery.GetAndStoreTokens(context);
-            context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!);;
-        });
     }
 }
