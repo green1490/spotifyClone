@@ -1,6 +1,5 @@
-using System.Text.RegularExpressions;
 using DB;
-using Model;
+using System.Text.RegularExpressions;
 using RouteInterface;
 
 namespace Routes;
@@ -22,7 +21,7 @@ public class Song:IRoute
                 await fileStream.CopyToAsync(memStream);
                 var data = memStream.ToArray();
                 var userID = context.Session.GetString("userID");
-                if(!string.IsNullOrEmpty(userID))
+                if(string.IsNullOrEmpty(userID))
                 {
                     return "Couldnt upload the file!";
                 }
@@ -41,5 +40,12 @@ public class Song:IRoute
         })
             .RequireAuthorization("user_function")
             .DisableAntiforgery();
+        app.MapGet("/play",async (DataContext db, HttpContext ctx, string name, string artist) =>
+        {
+            var song = db.Songs.Where(row => row.Name == name && row.Artist == artist).First();
+            ctx.Response.ContentType = "audio/mpeg";
+            await ctx.Response.BodyWriter.WriteAsync(song.SongData);
+        }).RequireAuthorization("user_function");
     }
+
 }
