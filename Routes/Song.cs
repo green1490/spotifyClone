@@ -1,6 +1,7 @@
 using DB;
 using System.Text.RegularExpressions;
 using RouteInterface;
+using Model;
 
 namespace Routes;
 
@@ -40,11 +41,32 @@ public class Song:IRoute
         })
             .RequireAuthorization("user_function")
             .DisableAntiforgery();
-        app.MapGet("/play",async (DataContext db, HttpContext ctx, string name, string artist) =>
+        app.MapGet("/play",async (HttpContext context ,DataContext db, HttpContext ctx, string name, string artist) =>
         {
-            var song = db.Songs.Where(row => row.Name == name && row.Artist == artist).First();
-            ctx.Response.ContentType = "audio/mpeg";
-            await ctx.Response.BodyWriter.WriteAsync(song.SongData);
+            try
+            {
+                var song = db.Songs.Where(row => row.Name == name && row.Artist == artist).First();
+                var userID = context.Session.GetString("userID");
+                if(string.IsNullOrEmpty(userID))
+                {
+                    return "Couldnt get the user!";
+                }
+                await db.AddAsync(
+                    new History
+                    {
+                        UserID = Convert.ToInt32(userID),
+                        SongID = song.ID
+                    });
+                await db.SaveChangesAsync();
+                ctx.Response.ContentType = "audio/mpeg";
+                await ctx.Response.BodyWriter.WriteAsync(song.SongData);
+                return "Started to play the music!";
+            }
+            catch
+            {   
+                return "Couldnt play the song!";
+            }
+
         }).RequireAuthorization("user_function");
     }
 
