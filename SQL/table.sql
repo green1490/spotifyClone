@@ -39,5 +39,6 @@ CREATE TABLE genre_song (
 CREATE TABLE history (
 	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	"song_id" int REFERENCES song(id),
-	"user_id" int REFERENCES users(id) ON DELETE CASCADE
+	"user_id" int REFERENCES users(id),
+	"listened" timestamp NOT NULL
 );

@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,4 +18,7 @@ public class History
     [Column("user_id")]
     [ForeignKey("user")]
     public int UserID {get;set;}
+
+    [Column("listened")]
+    public DateTime Listened {get;set;} = DateTime.UtcNow;
 }

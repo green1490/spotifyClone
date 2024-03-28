@@ -51,6 +51,8 @@ public class Song:IRoute
                 {
                     return "Couldnt get the user!";
                 }
+                ctx.Response.ContentType = "audio/mpeg";
+                await ctx.Response.BodyWriter.WriteAsync(song.SongData);
                 await db.AddAsync(
                     new History
                     {
@@ -58,8 +60,6 @@ public class Song:IRoute
                         SongID = song.ID
                     });
                 await db.SaveChangesAsync();
-                ctx.Response.ContentType = "audio/mpeg";
-                await ctx.Response.BodyWriter.WriteAsync(song.SongData);
                 return "Started to play the music!";
             }
             catch
