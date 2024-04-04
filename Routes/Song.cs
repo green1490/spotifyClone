@@ -1,3 +1,4 @@
+using url;
 using DB;
 using System.Text.RegularExpressions;
 using RouteInterface;
@@ -9,6 +10,19 @@ public class Song:IRoute
 {
     public void Map(WebApplication app)
     {
+        app.MapGet("/test", async () =>
+        {   
+            try
+            {
+                //error handling
+                var handler = await UrlHandler.CreateAsync("American idiot","Green Day");
+            }
+            catch(Exception e)
+            {
+                
+            }
+        });
+
         app.MapPost("/upload", async (HttpContext context, IFormFile file, DataContext db, string name, string artist) => 
         {
             string pattern = @"^.+\.aac|m4a|mp4|mp3|wav|aac|ogg|flac$";
@@ -69,5 +83,4 @@ public class Song:IRoute
 
         }).RequireAuthorization("user_function");
     }
-
 }
