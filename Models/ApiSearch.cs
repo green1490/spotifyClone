@@ -8,7 +8,7 @@ public class Item
     public string name { get; set; } = string.Empty;
 }
 
-public class ApiID
+public class ApiSearch
 {
     public Tracks tracks { get; set; } = new();
 }
