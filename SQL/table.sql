@@ -1,6 +1,6 @@
 CREATE TABLE genre (
 	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	"genre" varchar NOT NULL UNIQUE
+	"name" varchar NOT NULL UNIQUE
 );
 
 CREATE TABLE users (
