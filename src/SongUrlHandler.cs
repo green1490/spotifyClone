@@ -1,28 +1,30 @@
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Model;
 using System.Text.Json;
 
 namespace url;
 
-public class UrlHandler
+public class SongUrlHandler
 {
     private string SongID {get;set;} = string.Empty;
     private string Name {get;set;} = string.Empty;
     private string Artist {get;set;} = string.Empty;
     private HttpClient Client {get;} = new();
-    private UrlHandler() {}
+    private SongUrlHandler() {}
 
     /// <param name="name"></param>
     /// <param name="artist"></param>
     /// <exception cref="ArgumentException">Null or empty is the argument</exception>
     /// <exception cref="InvalidOperationException">Couldnt find the song ID</exception>
-    public static async Task<UrlHandler> CreateAsync(string name, string artist)
+    public static async Task<SongUrlHandler> CreateAsync(string name, string artist)
     {
         if(string.IsNullOrEmpty(name) || string.IsNullOrEmpty(name))
         {
             throw new ArgumentException();
         }
 
-        UrlHandler handler = new()
+        SongUrlHandler handler = new()
         {
             Name = name.Trim().ToLower(),
             Artist = artist.Trim().ToLower()
@@ -58,7 +60,8 @@ public class UrlHandler
         return null;
     }
 
-    public async Task<List<string>?> ListSongGenres()
+    /// <exception cref="InvalidOperationException">Couldnt find the song ID</exception>
+    public async Task<List<string>> ListSongGenres()
     {
         var httpMessage = await Client.GetAsync("https://www.chosic.com/api/tools/tracks/6nTiIhLmQ3FWhvrGafw2zj");
         var response = await httpMessage.Content.ReadAsStreamAsync();
@@ -70,14 +73,13 @@ public class UrlHandler
             httpMessage = await Client.GetAsync($"https://www.chosic.com/api/tools/artists?ids={artist.id}");
             response = await httpMessage.Content.ReadAsStreamAsync();
             var artistApiResponse = await JsonSerializer.DeserializeAsync<ApiArtist>(response);
-            var genres = artistApiResponse?.artists.First().genres;
+            var genres = (artistApiResponse?.artists.First().genres) ?? throw new InvalidOperationException("Genre had null value");
             return genres;
         }
-
-        return null;
+        throw new InvalidOperationException("Artist was null");
     }
 
-    ~UrlHandler()
+    ~SongUrlHandler()
     {
         Client.Dispose();
     }
