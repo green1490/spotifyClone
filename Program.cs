@@ -1,12 +1,15 @@
 using DB;
+using Npgsql;
 using Routes;
+using dotenv.net;
+using dotenv.net.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -28,7 +31,16 @@ builder.Services.AddSwaggerGen(
 );
 builder.Services.AddDbContext<DataContext>(option => 
 {
-    option.UseNpgsql(builder.Configuration.GetConnectionString("DataBase"));
+    option.UseNpgsql(
+        new NpgsqlConnectionStringBuilder()
+        {
+            Username = EnvReader.GetStringValue("USERNAME"),
+            Password = EnvReader.GetStringValue("PASSWORD"),
+            Database = EnvReader.GetStringValue("DATABASE"),
+            Port = int.Parse(EnvReader.GetStringValue("PORT")),
+            Host = EnvReader.GetStringValue("HOST"),
+        }.ConnectionString
+        );
 });
 
 builder.Services.AddDistributedMemoryCache();
