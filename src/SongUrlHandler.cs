@@ -1,6 +1,5 @@
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Model;
+using StringResources;
 using System.Text.Json;
 
 namespace url;
@@ -35,7 +34,7 @@ public class SongUrlHandler
 
         if(string.IsNullOrEmpty(id))
         {
-            throw new InvalidOperationException("Wrong informations!");
+            throw new InvalidOperationException(StringSingleton.InformationError);
         }
         else
         {
@@ -63,7 +62,7 @@ public class SongUrlHandler
     /// <exception cref="InvalidOperationException">Couldnt find the song ID</exception>
     public async Task<List<string>> ListSongGenres()
     {
-        var httpMessage = await Client.GetAsync("https://www.chosic.com/api/tools/tracks/6nTiIhLmQ3FWhvrGafw2zj");
+        var httpMessage = await Client.GetAsync($"https://www.chosic.com/api/tools/tracks/{SongID}");
         var response = await httpMessage.Content.ReadAsStreamAsync();
         var trackApiResponse = await JsonSerializer.DeserializeAsync<ApiTracks>(response);
         var artist = trackApiResponse?.artists.First();
@@ -73,10 +72,10 @@ public class SongUrlHandler
             httpMessage = await Client.GetAsync($"https://www.chosic.com/api/tools/artists?ids={artist.id}");
             response = await httpMessage.Content.ReadAsStreamAsync();
             var artistApiResponse = await JsonSerializer.DeserializeAsync<ApiArtist>(response);
-            var genres = (artistApiResponse?.artists.First().genres) ?? throw new InvalidOperationException("Genre had null value");
+            var genres = (artistApiResponse?.artists.First().genres) ?? throw new InvalidOperationException(StringSingleton.GenreError);
             return genres;
         }
-        throw new InvalidOperationException("Artist was null");
+        throw new InvalidOperationException(StringSingleton.ArtistError);
     }
 
     ~SongUrlHandler()

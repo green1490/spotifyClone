@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using StringResources;
 
 public class User:IRoute
 {
@@ -18,11 +19,11 @@ public class User:IRoute
             {
                 await db.AddAsync(user);
                 await db.SaveChangesAsync();
-                return "Successful registration!";
+                return StringSingleton.Registration;
             }
             catch
             {
-                return "Unseccessful registration!";
+                return StringSingleton.RegistrationError;
             }
         });
 
@@ -41,7 +42,7 @@ public class User:IRoute
             }
             catch
             {
-                return "Unseccessful login!";
+                return StringSingleton.LoginError;
             }
 
             List<Claim> claims =
@@ -57,7 +58,7 @@ public class User:IRoute
                 claimsPrincipal
             );
 
-            return "Successful login!";
+            return StringSingleton.Login;
         });
 
         app.MapPut("/password", async (Users user, DataContext db) => 
@@ -65,7 +66,7 @@ public class User:IRoute
             var result = await db.Users.Where(field => field.Name == user.Name).FirstAsync();
             result.Password = user.Password;
             await db.SaveChangesAsync();
-            return "Changed Password!";
+            return StringSingleton.PasswordChange;
         }).RequireAuthorization("user_function");
     }
 }

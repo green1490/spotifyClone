@@ -4,6 +4,7 @@ using Model;
 using RouteInterface;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using StringResources;
 
 namespace Routes;
 
@@ -19,7 +20,7 @@ public class Song:IRoute
             var extension = Path.GetExtension(file.FileName);
             if (regex.Match(extension).Success == false)
             {
-                return "Wrong file format!";
+                return StringSingleton.WrongFormat;
             }
 
             using var fileStream = file.OpenReadStream();
@@ -30,7 +31,7 @@ public class Song:IRoute
             var userID = context.Session.GetString("userID");
             if(string.IsNullOrEmpty(userID))
             {
-                return "Sign in to upload!";
+                return StringSingleton.SignIn;
             }
             
             var song = new Model.Song() 
@@ -49,11 +50,11 @@ public class Song:IRoute
                 await db.AddAsync(song);
                 await db.SaveChangesAsync();
                 await db.Database.ExecuteSqlAsync($"CALL insert_genre ({song.ID},{genres})");
-                return "Successful upload!";
+                return StringSingleton.SuccessfulUpload;
             }
             catch
             {
-                return "Unsuccessful upload!";
+                return StringSingleton.UnsuccessfulUpload;
             }
         })
             .RequireAuthorization("user_function")
@@ -66,7 +67,7 @@ public class Song:IRoute
                 var userID = context.Session.GetString("userID");
                 if(string.IsNullOrEmpty(userID))
                 {
-                    return "Couldnt get the user!";
+                    return StringSingleton.SignIn;
                 }
                 ctx.Response.ContentType = "audio/mpeg";
                 await ctx.Response.BodyWriter.WriteAsync(song.SongData);
@@ -77,11 +78,11 @@ public class Song:IRoute
                         SongID = song.ID
                     });
                 await db.SaveChangesAsync();
-                return "Started to play the music!";
+                return StringSingleton.PlaySong;
             }
             catch
             {   
-                return "Couldnt play the song!";
+                return StringSingleton.PlaySongError;
             }
         }).RequireAuthorization("user_function");
     }
