@@ -5,18 +5,24 @@ CREATE OR REPLACE PROCEDURE insert_genre(new_song_id INTEGER, genres VARCHAR[]) 
   	inserted_id INTEGER;
   BEGIN
   	FOREACH genre_item IN ARRAY genres
-    LOOP
+    loop
+	    -- check if its in the table
 	    SELECT name FROM genre
 	    INTO table_genre
 	   	WHERE name = genre_item;
     	
+	   -- if not insert into the table
 	   	IF table_genre IS NULL then
 	   		insert into genre(name) values (genre_item)
 	   		returning id into inserted_id;
-	   		
-	   		insert into genre_song(genre_id,song_id) 
-	   		values (inserted_id, new_song_id);   		
+		-- if exits get its id
+	   	else
+	   		select id from genre into inserted_id
+	   		where name = table_genre;
 	   	END IF;
+	   	-- make connection
+		insert into genre_song(genre_id,song_id) 
+		values (inserted_id, new_song_id);	
     END LOOP;
   END
 $$ LANGUAGE plpgsql;
