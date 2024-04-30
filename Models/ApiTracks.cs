@@ -1,15 +1,5 @@
 namespace Model;
 
-public class Album
-{
-    public string name { get; set; } = string.Empty;
-    public string album_type { get; set; } = string.Empty;
-    public string release_date { get; set; } = string.Empty;
-    public string release_date_precision { get; set; } = string.Empty;
-    public string image_default { get; set; } = string.Empty;
-    public string image_large { get; set; } = string.Empty;
-}
-
 public class Artist
 {
     public string id { get; set; } = string.Empty;

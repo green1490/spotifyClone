@@ -78,6 +78,15 @@ public class SongUrlHandler
         throw new InvalidOperationException(StringSingleton.ArtistError);
     }
 
+    public async Task<dynamic?> RecommendSongs(string limit)
+    {
+        var httpMessage = await Client.GetAsync($"https://www.chosic.com/api/tools/recommendations?seed_tracks={SongID}&limit={limit}");
+        var response = await httpMessage.Content.ReadAsStreamAsync();
+        var recommendationApiResponse = await JsonSerializer.DeserializeAsync<ApiRecommendation>(response);
+        var recommendedSongs = recommendationApiResponse?.tracks.Select(item => new{item.name, Artist = item.artists.First().name}).ToArray();
+        return recommendedSongs;
+    }
+
     ~SongUrlHandler()
     {
         Client.Dispose();

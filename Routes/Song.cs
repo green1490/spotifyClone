@@ -85,5 +85,11 @@ public class Song:IRoute
                 return StringSingleton.PlaySongError;
             }
         }).RequireAuthorization("user_function");
+    app.MapGet("/recommendation",async (string name, string artist, string limit) =>
+    {
+        var handler = await SongUrlHandler.CreateAsync(name, artist);
+        return await handler.RecommendSongs(limit);
+
+    }).RequireAuthorization("user_function");
     }
 }
