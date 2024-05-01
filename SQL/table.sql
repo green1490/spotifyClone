@@ -35,10 +35,3 @@ CREATE TABLE genre_song (
 	"genre_id" int REFERENCES genre(id),
 	"song_id" int REFERENCES song(id)
 );
-
-CREATE TABLE history (
-	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	"song_id" int REFERENCES song(id),
-	"user_id" int REFERENCES users(id),
-	"listened" timestamp NOT NULL
-);

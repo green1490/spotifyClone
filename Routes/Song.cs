@@ -1,10 +1,9 @@
 using DB;
 using url;
-using Model;
 using RouteInterface;
+using StringResources;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using StringResources;
 
 namespace Routes;
 
@@ -59,32 +58,18 @@ public class Song:IRoute
         })
             .RequireAuthorization("user_function")
             .DisableAntiforgery();
-        app.MapGet("/play",async (HttpContext context ,DataContext db, HttpContext ctx, string name, string artist) =>
+
+    app.MapGet("/play", async (DataContext db, string name, string artist, HttpContext ctx) =>
+    {
+        var song = db.Songs.Where(row => row.Name == name && row.Artist == artist).First();
+        var userID = ctx.Session.GetString("userID");
+        if (string.IsNullOrEmpty(userID) == false)
         {
-            try
-            {
-                var song = db.Songs.Where(row => row.Name == name && row.Artist == artist).First();
-                var userID = context.Session.GetString("userID");
-                if(string.IsNullOrEmpty(userID))
-                {
-                    return StringSingleton.SignIn;
-                }
-                ctx.Response.ContentType = "audio/mpeg";
-                await ctx.Response.BodyWriter.WriteAsync(song.SongData);
-                await db.AddAsync(
-                    new History
-                    {
-                        UserID = Convert.ToInt32(userID),
-                        SongID = song.ID
-                    });
-                await db.SaveChangesAsync();
-                return StringSingleton.PlaySong;
-            }
-            catch
-            {   
-                return StringSingleton.PlaySongError;
-            }
-        }).RequireAuthorization("user_function");
+            ctx.Response.ContentType = "audio/mpeg";
+            await ctx.Response.BodyWriter.WriteAsync(song.SongData);
+        }
+    }).RequireAuthorization("user_function");
+
     app.MapGet("/recommendation",async (string name, string artist, string limit) =>
     {
         var handler = await SongUrlHandler.CreateAsync(name, artist);

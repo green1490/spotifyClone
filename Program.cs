@@ -29,6 +29,13 @@ builder.Services.AddSwaggerGen(
         c.EnableAnnotations();
     }
 );
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(1);
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddDbContext<DataContext>(option => 
 {
     option.UseNpgsql(
@@ -43,12 +50,6 @@ builder.Services.AddDbContext<DataContext>(option =>
         );
 });
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromDays(1);
-    options.Cookie.IsEssential = true;
-});
 
 var app = builder.Build();
 
