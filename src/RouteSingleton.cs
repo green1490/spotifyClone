@@ -8,6 +8,8 @@ public class RouteSingleton
 
     public User user = new();
     public Song song = new();
+    public Playlist playlist = new();
+    public PlaylistContent playlistManager = new();
 
     public static RouteSingleton GetInstance()
     {

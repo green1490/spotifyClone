@@ -17,18 +17,17 @@ CREATE TABLE song (
 	"user_id" int references users(id)
 );
 
-CREATE TABLE playlist_content (
-	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	"song_id" int REFERENCES song(id)
-);
-
 CREATE TABLE playlist (
 	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	"name" varchar NOT NULL,
+	"name" varchar NOT NULL UNIQUE,
 	"created" TIMESTAMP NOT NULL,
 	"modified" TIMESTAMP NOT NULL,
-	"user_id" int REFERENCES users(id),
-	"playlist_content" int REFERENCES playlist_content(id)
+	"user_id" int REFERENCES users(id)
+);
+
+CREATE TABLE playlist_content (
+	"playlist_id" int REFERENCES playlist(id),
+	"song_id" int REFERENCES song(id)
 );
 
 CREATE TABLE genre_song (

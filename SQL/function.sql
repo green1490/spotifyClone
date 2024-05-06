@@ -26,3 +26,12 @@ CREATE OR REPLACE PROCEDURE insert_genre(new_song_id INTEGER, genres VARCHAR[]) 
     END LOOP;
   END
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE update_modification(playlist_id INTEGER) AS
+$$
+	BEGIN
+		UPDATE playlist 
+		SET modified = NOW()
+		WHERE id = playlist_id;
+	END;
+$$ LANGUAGE plpgsql;

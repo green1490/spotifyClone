@@ -70,7 +70,9 @@ var singleton = RouteSingleton.GetInstance();
 
 handler
     .Add(singleton.user)
-    .Add(singleton.song);
+    .Add(singleton.song)
+    .Add(singleton.playlist)
+    .Add(singleton.playlistManager);
 
 handler.Map();
 app.Run();
