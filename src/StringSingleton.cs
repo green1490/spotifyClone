@@ -19,6 +19,7 @@ public static class StringSingleton
     public static string Playlist {get;} = "Playlist was created!";
     public static string PlaylistAddedSong {get;} = "Song was added to the playlist!";
     public static string PlaylistAddedSongError {get;} = "Could not added the song!";
+    public static string PlaylistAlreadyAdded {get;} = "Song is already added!";
     public static string PlaylistRemoveSong {get;} = "Song is removed from the playlist!";
     public static string PlaylistRemoveSongError {get;} = "Could not remove the song!";
 }
